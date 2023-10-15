@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 
-def error_diffusion_dither(PATH,num_colors = 2, Kernel = 'Simple', Grayscale = False, verbose = True):
+def custom_kernel_dither(PATH,num_colors = 2, Kernel = 'Simple', Grayscale = True, verbose = True):
     img = np.array(Image.open(PATH))/255
     if Grayscale:
         img = np.mean(img,axis = 2)
@@ -18,7 +18,7 @@ def error_diffusion_dither(PATH,num_colors = 2, Kernel = 'Simple', Grayscale = F
     if Kernel == 'Simple':
         kernel = [[None, 0.5],[0.5, 0]] # Simple Error Diffusion
     elif Kernel == 'Floyd':
-        kernel = [[0, 0, 7],[3,5, 1]] # Floyd-Steinberg
+        kernel = np.array([[0, 0, 7],[3,5, 1]])/16 # Floyd-Steinberg
         kernel[0,1] = None # Floyd-Steinberg
     elif Kernel == 'Jarvis':
         kernel = np.array([[0,0,0,7,5],[3,5,7,5,3],[1,3,5,3,1]])/48 # Jarvis-Judice-Ninke
@@ -30,16 +30,15 @@ def error_diffusion_dither(PATH,num_colors = 2, Kernel = 'Simple', Grayscale = F
         kernel = Kernel
         
     
-    
-    offset = np.squeeze(np.where(np.reshape(np.in1d(kernel,None),np.shape(kernel))))
+    kernel = np.array(kernel)
+    offset = np.squeeze(np.where(np.isnan(kernel.astype(float))))
     kh = np.shape(kernel)[0]
     kl = np.shape(kernel)[1]
-    kernel = np.array(kernel)
     kernel[offset[0],offset[1]] = 0
     kernel = kernel.astype(np.float64)
     for c in range(img_quantised.shape[2]):    
-        for row in range(h - kh + offset[0]):
-            for column in range(l - kl + offset[1]):
+        for row in range(h - kh + offset[0]-1):
+            for column in range(l - kl + offset[1]-1):
                 old_c = img_quantised[row+offset[0],column+offset[1],c]
                 img_quantised[row+offset[0],column+offset[1],c] = np.floor(img_quantised[row+offset[0],column+offset[1],c]*(num_colors-1)+0.5)/(num_colors-1)
                 err = old_c - img_quantised[row+offset[0],column+offset[1],c]
@@ -55,6 +54,30 @@ def error_diffusion_dither(PATH,num_colors = 2, Kernel = 'Simple', Grayscale = F
         img_quantised.show()
     return img_quantised
 
+# Grayllscale
 
-# error_diffusion_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Simple', Grayscale = True, verbose = True)
-# error_diffusion_dither('Data/Penguins.jpg',num_colors = 2, Kernel = [[None, 0.5],[0.5, 0]], Grayscale = True, verbose = True) 
+img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = [[None, 0.5],[0.5, 0]], Grayscale = True, verbose = True)
+img.save('Results/simple_kernel.jpg')
+
+img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Atkinson', Grayscale = True, verbose = True)
+img.save('Results/atkinson_kernel.jpg')
+
+img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Floyd', Grayscale = True, verbose = True)
+img.save('Results/floyd_kernel.jpg')
+
+img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Jarvis', Grayscale = True, verbose = True)
+img.save('Results/jarvis_kernel.jpg')
+
+# Full color
+
+img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = [[None, 0.5],[0.5, 0]], Grayscale = False, verbose = True)
+img.save('Results/simple_kernel.jpg')
+
+img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Atkinson', Grayscale = False, verbose = True)
+img.save('Results/atkinson_kernel.jpg')
+
+img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Floyd', Grayscale = False, verbose = True)
+img.save('Results/floyd_kernel.jpg')
+
+img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Jarvis', Grayscale = False, verbose = True)
+img.save('Results/jarvis_kernel.jpg')
