@@ -9,7 +9,7 @@ Methods:
 + Custom Kernel Dithering (which includes methods: Atkinson, Floyd-Steinberg, Jarvis-Judice-Ninke dithering)
 
 # Gallery
-# (Click on images to see Dithering without compression)
+## (Click on images to see Dithering with less compression, to see witout compression clone Results folder)
 
 ## Bayer Dithering
 
