@@ -1,8 +1,11 @@
 from PIL import Image
 import numpy as np
 
-def custom_kernel_dither(PATH,num_colors = 2, Kernel = 'Simple', Grayscale = True, verbose = True):
-    img = np.array(Image.open(PATH))/255
+def custom_kernel_dither(PATH = '',num_colors = 2, Kernel = 'Simple', Grayscale = True, verbose = True,IMAGE = None):
+    if IMAGE is None:
+        img = np.array(Image.open(PATH))/255
+    else:
+        img = np.array(IMAGE)/255
     if Grayscale:
         img = np.mean(img,axis = 2)
         

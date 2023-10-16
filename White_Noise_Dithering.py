@@ -1,8 +1,11 @@
 from PIL import Image
 import numpy as np
 
-def white_noise_dither(PATH, num_colors = 2, scale_factor = 0.1, Binary_dithering = True, Grayscale = True):
-    img = np.array(Image.open(PATH))/255
+def white_noise_dither(PATH = '', num_colors = 2, scale_factor = 0.1, Binary_dithering = True, Grayscale = True,IMAGE = None):
+    if IMAGE is None:
+        img = np.array(Image.open(PATH))/255
+    else:
+        img = np.array(IMAGE)/255
     M = np.abs(np.random.randn(img.shape[0],img.shape[1])[:,:,None])
 
     if Grayscale:

@@ -2,8 +2,11 @@ from PIL import Image
 import numpy as np
 
 
-def bayer_dither(PATH,num_colors = 2,kernel_size = 2,scale_factor = 1,Binary_dithering = True, Grayscale = False,verbose = True):
-    img = np.array(Image.open(PATH))/255
+def bayer_dither(PATH = '',num_colors = 2,kernel_size = 2,scale_factor = 1,Binary_dithering = True, Grayscale = False,verbose = True ,IMAGE = None):
+    if IMAGE is None:
+        img = np.array(Image.open(PATH))/255
+    else:
+        img = np.array(IMAGE)/255
 
     if kernel_size == 2:
         M = np.array([[0,2],[3,1]]) / np.power(kernel_size,2) - 0.5

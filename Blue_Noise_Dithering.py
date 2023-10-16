@@ -2,8 +2,11 @@ from PIL import Image
 import numpy as np
 from scipy.ndimage import gaussian_filter
 
-def blue_noise_dither(PATH,num_colors = 2, scale_factor = 1, sigma = 5, Binary_dithering = True, Grayscale = True, verbose = True):
-    img = np.array(Image.open(PATH))/255
+def blue_noise_dither(PATH = '',num_colors = 2, scale_factor = 1, sigma = 5, Binary_dithering = True, Grayscale = True, verbose = True,IMAGE = None):
+    if IMAGE is None:
+        img = np.array(Image.open(PATH))/255
+    else:
+        img = np.array(IMAGE)/255
 
     M = np.abs(np.random.randn(img.shape[0],img.shape[1])[:,:,None])
     M = gaussian_filter(M, sigma)        
