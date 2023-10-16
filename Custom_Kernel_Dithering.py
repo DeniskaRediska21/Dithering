@@ -14,7 +14,6 @@ def custom_kernel_dither(PATH,num_colors = 2, Kernel = 'Simple', Grayscale = Tru
     h = img_quantised.shape[0]
     l = img_quantised.shape[1]
     
-    
     if Kernel == 'Simple':
         kernel = [[None, 0.5],[0.5, 0]] # Simple Error Diffusion
     elif Kernel == 'Floyd':
@@ -34,50 +33,54 @@ def custom_kernel_dither(PATH,num_colors = 2, Kernel = 'Simple', Grayscale = Tru
     offset = np.squeeze(np.where(np.isnan(kernel.astype(float))))
     kh = np.shape(kernel)[0]
     kl = np.shape(kernel)[1]
+    img_with_blank_boarders = np.zeros((h+2*kh,l+2*kl,img_quantised.shape[2]))
+    img_with_blank_boarders[kh:h+kh,kl:l+kl] = img_quantised
+    
+
     kernel[offset[0],offset[1]] = 0
     kernel = kernel.astype(np.float64)
-    for c in range(img_quantised.shape[2]):    
-        for row in range(h - kh + offset[0]-1):
-            for column in range(l - kl + offset[1]-1):
-                old_c = img_quantised[row+offset[0],column+offset[1],c]
-                img_quantised[row+offset[0],column+offset[1],c] = np.floor(img_quantised[row+offset[0],column+offset[1],c]*(num_colors-1)+0.5)/(num_colors-1)
-                err = old_c - img_quantised[row+offset[0],column+offset[1],c]
-                img_quantised[row:row+kh,column:column+kl,c] += err*kernel
+    for c in range(img_with_blank_boarders.shape[2]):    
+        for row in range(h + offset[0]):
+            for column in range(l + offset[1]):
+                old_c = img_with_blank_boarders[row+offset[0],column+offset[1],c]
+                img_with_blank_boarders[row+offset[0],column+offset[1],c] = np.floor(img_with_blank_boarders[row+offset[0],column+offset[1],c]*(num_colors-1)+0.5)/(num_colors-1)
+                err = old_c - img_with_blank_boarders[row+offset[0],column+offset[1],c]
+                img_with_blank_boarders[row:row+kh,column:column+kl,c] += err*kernel
                 
     
     
-    if img_quantised.shape[2]==1:
-        img_quantised = np.squeeze(img_quantised)
-    
-    img_quantised = Image.fromarray((img_quantised*255).astype(np.uint8))
+    if img_with_blank_boarders.shape[2]==1:
+        img_with_blank_boarders = np.squeeze(img_with_blank_boarders)
+    img_with_blank_boarders = img_with_blank_boarders[kh:h,kl:l]  
+    img_with_blank_boarders = Image.fromarray((img_with_blank_boarders*255).astype(np.uint8))
     if verbose:
-        img_quantised.show()
-    return img_quantised
+        img_with_blank_boarders.show()
+    return img_with_blank_boarders
 
-# Grayllscale
-
-img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = [[None, 0.5],[0.5, 0]], Grayscale = True, verbose = True)
-img.save('Results/simple_kernel.jpg')
-
-img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Atkinson', Grayscale = True, verbose = True)
-img.save('Results/atkinson_kernel.jpg')
-
-img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Floyd', Grayscale = True, verbose = True)
-img.save('Results/floyd_kernel.jpg')
-
-img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Jarvis', Grayscale = True, verbose = True)
-img.save('Results/jarvis_kernel.jpg')
-
-# Full color
-
-img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = [[None, 0.5],[0.5, 0]], Grayscale = False, verbose = True)
-img.save('Results/simple_kernel.jpg')
-
-img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Atkinson', Grayscale = False, verbose = True)
-img.save('Results/atkinson_kernel.jpg')
-
-img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Floyd', Grayscale = False, verbose = True)
-img.save('Results/floyd_kernel.jpg')
-
-img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Jarvis', Grayscale = False, verbose = True)
-img.save('Results/jarvis_kernel.jpg')
+## Grayllscale
+#
+#img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = [[None, 0.5],[0.5, 0]], Grayscale = True, verbose = True)
+#img.save('Results/simple_kernel_grayscale.jpg')
+#
+#img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Atkinson', Grayscale = True, verbose = True)
+#img.save('Results/atkinson_kernel_grayscale.jpg')
+#
+#img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Floyd', Grayscale = True, verbose = True)
+#img.save('Results/floyd_kernel_grayscale.jpg')
+#
+#img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Jarvis', Grayscale = True, verbose = True)
+#img.save('Results/jarvis_kernel_grayscale.jpg')
+#
+## Full color
+#
+#img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = [[None, 0.5],[0.5, 0]], Grayscale = False, verbose = True)
+#img.save('Results/simple_kernel_full.jpg')
+#
+#img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Atkinson', Grayscale = False, verbose = True)
+#img.save('Results/atkinson_kernel_full.jpg')
+#
+#img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Floyd', Grayscale = False, verbose = True)
+#img.save('Results/floyd_kernel_full.jpg')
+#
+#img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Jarvis', Grayscale = False, verbose = True)
+#img.save('Results/jarvis_kernel_full.jpg')
