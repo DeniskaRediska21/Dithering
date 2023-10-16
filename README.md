@@ -8,6 +8,9 @@ Methods:
 + Blue Noise Dithering
 + Custom Kernel Dithering (which includes methods: Atkinson, Floyd-Steinberg, Jarvis-Judice-Ninke dithering)
 
+# Gallery
+# (Click on images to see Dithering without compression)
+
 ## Bayer Dithering
 
 ```
@@ -59,7 +62,7 @@ img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Atkinso
 
 | Original                       | Atkinson Grayscale                                          | Atkinson Full-Color                                     |
 |--------------------------------|-------------------------------------------------------------|---------------------------------------------------------|
-| ![Original](Data/Penguins.jpg) | ![Atkinson Grayscale](Results/atinson_kernel_grayscale.jpg) | ![Atkinson Full-Color](Results/atinson_kernel_full.jpg) |
+| ![Original](Data/Penguins.jpg) | ![Atkinson Grayscale](Results/atkinson_kernel_grayscale.jpg) | ![Atkinson Full-Color](Results/atkinson_kernel_full.jpg) |
 
 ```
 img = custom_kernel_dither('Data/Penguins.jpg',num_colors = 2, Kernel = 'Floyd', Grayscale = True, verbose = True)
